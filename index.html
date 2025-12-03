@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonkeyType - Typing Test</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Logo -->
+    <div class="logo">
+        <img src="assets/logo.png" alt="DonkeyType" class="logo-img">
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Menu Bar - Single Horizontal Row -->
+        <div class="menu-bar">
+            <div class="menu-group left-group">
+                <button class="menu-btn active" data-mode="test">Typing Test</button>
+                <button class="menu-btn" data-mode="practice">Typing Practice</button>
+            </div>
+
+            <div class="menu-sep" aria-hidden="true"></div>
+
+            <div class="menu-group right-group" id="dynamic-menu"></div>
+            <div class="menu-sep" aria-hidden="true"></div>
+
+            <div class="timer-display" id="timer-display"></div>
+        </div>
+
+        <!-- Typing Display Area -->
+        <div class="typing-area" id="typing-area">
+            <div class="typing-text" id="typing-text"></div>
+            <div class="cursor" id="cursor"></div>
+            
+            <div class="result-card hidden" id="result-card">
+                <div class="result-header">Test Complete</div>
+                <div class="result-stats">
+                    <div class="result-item">
+                        <div class="result-label">WPM</div>
+                        <div class="result-value" id="wpm">0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Accuracy</div>
+                        <div class="result-value" id="accuracy">0%</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Errors</div>
+                        <div class="result-value" id="errors">0</div>
+                    </div>
+                </div>
+                <button class="result-btn" id="restart-btn">Restart</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="words.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
