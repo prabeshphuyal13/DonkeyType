@@ -131,23 +131,23 @@ const PRACTICE_TEXTS = {
     middle: [
         ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
         ['ad', 'as', 'ah', 'al', 'sad', 'had', 'lad', 'dad', 'fad'],
-        ['ads', 'lads', 'dads', 'gal', 'fads', 'had', 'ash', 'ask', 'elf'],
+        ['ads', 'lads', 'dads', 'gal', 'fads', 'had', 'ash', 'ask', 'lf'],
         ['glad', 'flag', 'half', 'dash', 'gash', 'flash', 'hall', 'fall', 'lass'],
-        ['ash;', 'half.', 'glad!', 'flash;', 'shall', 'flesh', 'gash.', 'flahs']
+        ['ash;', 'half', 'glad', 'flash;', 'shall', 'flesh', 'gash.', 'flahs']
     ],
     upper: [
         ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
         ['we', 'try', 'two', 'pot', 'top', 'wet', 'pet', 'toy', 'row'],
         ['wet', 'pet', 'row', 'try', 'top', 'tip', 'type', 'rope', 'wire'],
         ['type', 'rope', 'wire', 'pier', 'quit', 'trip', 'pour', 'yore', 'euro'],
-        ['quip!', 'power.', 'type;', 'euro!', 'typed', 'query', 'trout;', 'poetry']
+        ['quip', 'power', 'type;', 'euro', 'type', 'query', 'trout', '[',']','poetry']
     ],
     lower: [
         ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
-        ['by', 'my', 'mix', 'box', 'numb', 'zero', 'buzz', 'next'],
-        ['box', 'mix', 'max', 'zen', 'buzz', 'club', 'verb', 'zero', 'menu'],
-        ['zone', 'buzz', 'club', 'verb', 'maze', 'next', 'buzz', 'custom', 'bronze'],
-        ['buzz,', 'zone.', 'custom;', 'bronze!', 'nexus', 'enzyme', 'buzzer;', 'cubic,']
+        ['bz', 'mx', 'mnx', 'bx', ',', 'zv', 'bvzz', 'nx'],
+        ['cb', 'xm', 'mbx', 'zcn', 'bmzz', 'xcb', 'v,b', 'zmmm.', 'mc'],
+        ['zxn', 'bnzz', 'cbb', 'czz', '/', 'xxx', 'zmc', 'bvzz'],
+        ['mcc,', 'x.', 'bc?', 'mbnm.', 'nzx', 'bvx', 'bbb..', 'cnn,']
     ],
     num: [
         ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
@@ -160,8 +160,8 @@ const PRACTICE_TEXTS = {
         ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')'],
         ['!@', '#$', '%^', '&*', '()', '!@#', '!@#$'],
         ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
-        ['Cat', 'Dog', 'Run', 'Jump', 'Happy', 'Quick', 'Speed', 'Type'],
-        ['Speed!', 'Type@', 'Happy#', 'Run!', 'Quick&', 'Happy!', 'Yes!', 'No!']
+        ['CAT', 'DOG', 'RUN', 'JUMP', 'HAPPY', 'QUICK', 'SPEED', 'TYPE'],
+        ['SPEED!', 'TYPE@', 'HAPPY#', 'RUN!', 'QUICK&', 'HAPPY!', 'YES!', 'NO!']
     ],
     mixed: [
         ['a', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog'],
