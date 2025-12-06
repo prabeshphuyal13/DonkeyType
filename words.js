@@ -133,7 +133,7 @@ const PRACTICE_TEXTS = {
         ['ad', 'as', 'ah', 'al', 'sad', 'had', 'lad', 'dad', 'fad'],
         ['ads', 'lads', 'dads', 'gal', 'fads', 'had', 'ash', 'ask', 'lf'],
         ['glad', 'flag', 'half', 'dash', 'gash', 'flash', 'hall', 'fall', 'lass'],
-        ['ash;', 'half', 'glad', 'flash;', 'shall', 'flesh', 'gash.', 'flahs']
+        ['ash;', 'half', 'glad', 'flash;', 'shall', 'flash', 'gash', 'flahs']
     ],
     upper: [
         ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
@@ -154,14 +154,14 @@ const PRACTICE_TEXTS = {
         ['01', '12', '23', '34', '45', '56', '67', '78', '89', '90'],
         ['123', '234', '345', '456', '567', '678', '789', '890', '901'],
         ['1234', '2345', '3456', '4567', '5678', '6789', '7890', '8901', '9012'],
-        ['2023', '1987', '90-10', '50/50', '100-200', '2024', '1st-2nd', '5x5']
+        ['2023', '1987', '90-10', '50=50', '100-200', '2024', '5=5', '3-1=2' ]
     ],
     special: [
-        ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')'],
+        ['!', '@', '_', '#', '$', '%', '^', '&', '*', '(', ')'],
         ['!@', '#$', '%^', '&*', '()', '!@#', '!@#$'],
         ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
-        ['CAT', 'DOG', 'RUN', 'JUMP', 'HAPPY', 'QUICK', 'SPEED', 'TYPE'],
-        ['SPEED!', 'TYPE@', 'HAPPY#', 'RUN!', 'QUICK&', 'HAPPY!', 'YES!', 'NO!']
+        ['CAT', 'DOG', 'RUN', 'JUMP', 'HAPPY_', 'QUICK', 'SPEED', 'TYPE'],
+        ['SPEED!', 'TYPE@', '_HAPPY#', 'RUN!', 'QUICK&', 'HAPPY!', 'YES!', 'NO!']
     ],
     mixed: [
         ['a', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog'],

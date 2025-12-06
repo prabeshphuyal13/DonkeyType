@@ -15,11 +15,15 @@
     --correct-color: #3b82f6;
     --error-red: #ef4444;
     --cursor-color: #3b82f6;
+    --typing-correct: #3b82f6;
+    --typing-error: #ef4444;
     --transition: 0.2s ease;
     --font-mono: 'Courier New', Courier, monospace;
     --menu-sep-gap: 12px; /* gap around separators */
     --layout-offset: 88px; /* vertical offset for menu (moved below logo) */
     --typing-offset: 44px; /* vertical offset for typing area (adjust to move box up/down) */
+    --btn-text-color: #ffffff;
+    --btn-active-text-color: #3b82f6;
 }
 
 /* ===== BODY & VIEWPORT ===== */
@@ -36,7 +40,42 @@ html, body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ===== LOGO ===== */
+/* ===== THEME TOGGLE BUTTON ===== */
+.theme-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 101;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    background: rgba(26, 31, 46, 0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: all var(--transition);
+    padding: 0;
+}
+
+.theme-btn:hover {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent-blue);
+    transform: rotate(20deg);
+}
+
+.theme-btn:active {
+    transform: rotate(20deg) scale(0.95);
+}
+
+.theme-btn svg {
+    width: 20px;
+    height: 20px;
+}
 .logo {
     position: fixed;
     top: 20px;
@@ -96,13 +135,19 @@ html, body {
     white-space: nowrap;
     flex-wrap: nowrap; /* keep a single row; show settings button if overflow */
     margin-top: var(--layout-offset);
-    overflow: hidden; /* hide overflow; no horizontal scrollbar */
+    overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     z-index: 90; /* keep below the logo (logo z-index:100) so logo visually sits above */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     transition: all var(--transition);
     width: min(95vw, 1000px);
     max-width: 1000px;
+    scrollbar-width: none; /* Firefox */
+}
+
+.menu-bar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
 }
 
 .menu-sep {
@@ -127,7 +172,7 @@ html, body {
 .menu-btn {
     background: transparent;
     border: 1px solid rgba(59, 130, 246, 0.25);
-    color: var(--text-secondary);
+    color: var(--btn-text-color);
     padding: 6px 14px;
     border-radius: 5px;
     font-family: var(--font-mono);
@@ -146,14 +191,6 @@ html, body {
     flex: 0 0 auto;
 }
 
-/* Ensure timer display matches menu height and stays aligned */
-.menu-bar .timer-display {
-    height: 36px;
-    display: flex;
-    align-items: center;
-    padding: 0 8px;
-}
-
 .menu-btn:hover {
     border-color: var(--accent-blue);
     color: var(--accent-blue);
@@ -161,9 +198,9 @@ html, body {
 }
 
 .menu-btn.active {
-    background: var(--accent-blue);
-    color: #ffffff;
-    border-color: var(--accent-blue);
+    background: #ffffff;
+    color: var(--btn-active-text-color);
+    border-color: #ffffff;
     font-weight: 600;
     box-shadow: 0 0 12px rgba(59, 130, 246, 0.4), 0 2px 4px rgba(59, 130, 246, 0.2);
     transform: translateY(-1px);
@@ -175,6 +212,14 @@ html, body {
 
 .menu-btn.toggle.inactive {
     opacity: 0.5;
+}
+
+/* Ensure timer display matches menu height and stays aligned */
+.menu-bar .timer-display {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
 }
 
 /* ===== TYPING AREA ===== */
@@ -262,11 +307,11 @@ html, body {
 }
 
 .char.correct {
-    color: var(--correct-color);
+    color: var(--typing-correct);
 }
 
 .char.incorrect {
-    color: var(--error-red);
+    color: var(--typing-error);
 }
 
 .char.current {
@@ -360,7 +405,7 @@ html, body {
     text-align: center;
     font-size: 36px;
     font-weight: 600;
-    color: var(--accent-blue);
+    color: #ffffff;
     margin-bottom: 32px;
     letter-spacing: 0.5px;
 }
@@ -379,7 +424,7 @@ html, body {
 
 .result-label {
     font-size: 11px;
-    color: var(--text-secondary);
+    color: var(--btn-active-text-color);
     text-transform: uppercase;
     letter-spacing: 1.2px;
     margin-bottom: 10px;
@@ -389,15 +434,15 @@ html, body {
 .result-value {
     font-size: 36px;
     font-weight: 600;
-    color: var(--accent-blue);
+    color: #ffffff;
     font-variant-numeric: tabular-nums;
 }
 
 .result-btn {
     width: 100%;
-    background: var(--accent-blue);
-    color: #ffffff;
-    border: none;
+    background: #ffffff;
+    color: var(--btn-active-text-color);
+    border: 1px solid #ffffff;
     padding: 12px 24px;
     border-radius: 6px;
     font-family: var(--font-mono);
@@ -409,9 +454,9 @@ html, body {
 }
 
 .result-btn:hover {
-    background: var(--accent-blue-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: #ffffff;
+    color: var(--btn-active-text-color);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
 }
 
 .result-btn:active {
@@ -430,8 +475,12 @@ html, body {
         gap: 6px;
         width: min(95vw, 1000px);
         max-width: 1000px;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none; /* Firefox */
     }
+
+    .menu-bar::-webkit-scrollbar { display: none; /* Chrome, Safari, Edge */ }
 
     .menu-btn {
         padding: 5px 10px;
@@ -464,9 +513,13 @@ html, body {
         gap: 4px;
         width: min(95vw, 1000px);
         max-width: 1000px;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none; /* Firefox */
         flex-wrap: nowrap;
     }
+
+    .menu-bar::-webkit-scrollbar { display: none; /* Chrome, Safari, Edge */ }
 
     .menu-section {
         flex-wrap: nowrap;
@@ -525,9 +578,13 @@ html, body {
         gap: 3px;
         width: min(95vw, 1000px);
         max-width: 1000px;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none; /* Firefox */
         flex-wrap: nowrap;
     }
+
+    .menu-bar::-webkit-scrollbar { display: none; /* Chrome, Safari, Edge */ }
 
     .menu-btn {
         padding: 4px 8px;
@@ -588,4 +645,39 @@ html, body {
     .container {
         gap: 20px;
     }
+}
+
+/* ===== THEME VARIANTS ===== */
+
+/* Solarized Dark Theme */
+html[data-theme="solarized"] {
+    --bg-dark: #002b36;
+    --bg-secondary: #073642;
+    --text-primary: #93a1a1;
+    --text-secondary: #839496;
+    --accent-blue: #268bd2;
+    --accent-blue-hover: #2aa198;
+    --cursor-color: #268bd2;
+}
+
+/* Nord Theme */
+html[data-theme="nord"] {
+    --bg-dark: #2e3440;
+    --bg-secondary: #3b4252;
+    --text-primary: #eceff4;
+    --text-secondary: #d8dee9;
+    --accent-blue: #88c0d0;
+    --accent-blue-hover: #81a1c1;
+    --cursor-color: #88c0d0;
+}
+
+/* Monokai Theme */
+html[data-theme="monokai"] {
+    --bg-dark: #272822;
+    --bg-secondary: #3e3d32;
+    --text-primary: #f8f8f2;
+    --text-secondary: #d4d4d0;
+    --accent-blue: #66d9ef;
+    --accent-blue-hover: #a1efe4;
+    --cursor-color: #66d9ef;
 }

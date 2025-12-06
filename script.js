@@ -16,6 +16,9 @@ const TIMER_MODES = {
     OFF: 'off'
 };
 
+const THEMES = ['default', 'solarized', 'nord', 'monokai'];
+const DEFAULT_THEME = 'default';
+
 const WPM_CHARS_PER_WORD = 5;
 const NUMBERS_PROBABILITY = 0.1;
 const PUNCTUATION_PROBABILITY = 0.08;
@@ -52,6 +55,7 @@ const timerEl = document.getElementById('timer-display');
 const dynamicMenuEl = document.getElementById('dynamic-menu');
 const restartBtnEl = document.getElementById('restart-btn');
 const typingAreaEl = document.getElementById('typing-area');
+const themeBtnEl = document.getElementById('theme-btn');
 
 // ===== DOM VALIDATION =====
 function validateDOMElements() {
@@ -62,7 +66,8 @@ function validateDOMElements() {
         timerEl,
         dynamicMenuEl,
         restartBtnEl,
-        typingAreaEl
+        typingAreaEl,
+        themeBtnEl
     };
     
     for (const [name, element] of Object.entries(requiredElements)) {
@@ -87,6 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
+    // Load and apply saved theme
+    loadTheme();
+    
     // Ensure active button matches current state
     document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
     const initialButton = document.querySelector(`[data-mode="${state.currentMode}"]`);
@@ -98,6 +106,35 @@ document.addEventListener('DOMContentLoaded', () => {
     generateTestText();
     setupEventListeners();
 });
+
+// ===== THEME MANAGEMENT =====
+function loadTheme() {
+    const savedTheme = localStorage.getItem('donkeytype-theme') || DEFAULT_THEME;
+    applyTheme(savedTheme);
+}
+
+function applyTheme(themeName) {
+    if (!THEMES.includes(themeName)) {
+        themeName = DEFAULT_THEME;
+    }
+    
+    if (themeName === DEFAULT_THEME) {
+        document.documentElement.removeAttribute('data-theme');
+    } else {
+        document.documentElement.setAttribute('data-theme', themeName);
+    }
+    
+    localStorage.setItem('donkeytype-theme', themeName);
+}
+
+function cycleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || DEFAULT_THEME;
+    const currentIndex = THEMES.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % THEMES.length;
+    const nextTheme = THEMES[nextIndex];
+    
+    applyTheme(nextTheme);
+}
 
 // ===== MENU RENDERING HELPERS =====
 function createMenuButton(text, action, value = null, isActive = false, isToggle = false, title = '') {
@@ -431,6 +468,11 @@ function setupEventListeners() {
         });
     }
 
+    // Theme toggle button
+    if (themeBtnEl) {
+        themeBtnEl.addEventListener('click', cycleTheme);
+    }
+
     // Re-check placeholder on resize (no overflow UI)
     window.addEventListener('resize', () => {
         // no-op (settings overlay removed)
@@ -584,8 +626,10 @@ function updateDisplay() {
             // Character has been typed
             if (state.keyTracker[index] === state.testText[index]) {
                 span.classList.add('correct');
+                span.textContent = state.testText[index]; // Show expected char in blue
             } else {
                 span.classList.add('incorrect');
+                span.textContent = state.keyTracker[index] || ''; // Show actual key pressed in red
             }
         }
 
