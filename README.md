@@ -1,6 +1,6 @@
 # DonkeyType
 
-DonkeyType is a lightweight, client-side typing test and practice web app. It provides timed and word-count tests, focused practice drills (rows, numbers, special chars), and a compact responsive UI with results (WPM, accuracy, errors).
+[DonkeyType](https://prabeshphuyal13.github.io/DonkeyType/) is a lightweight, client-side typing test and practice web app. It provides timed and word-count tests, focused practice drills (rows, numbers, special chars), and a compact responsive UI with results (WPM, accuracy, errors).
 
 **Quick Summary**
 - **Type:** Browser-based single-page app (no backend).
