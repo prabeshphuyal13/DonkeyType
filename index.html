@@ -29,23 +29,27 @@
 
     <!-- Main Container -->
     <div class="container">
-        <!-- Menu Bar - Single Horizontal Row -->
+        <!-- Menu Bar - Wrapping Sections -->
         <div class="menu-bar">
-            <div class="menu-group left-group">
+            <!-- Section 1: Select Mode -->
+            <div class="menu-section left-group" id="menu-mode">
                 <button class="menu-btn active" data-mode="test">Typing Test</button>
                 <button class="menu-btn" data-mode="practice">Typing Practice</button>
             </div>
 
-            <div class="menu-sep" aria-hidden="true"></div>
+            <!-- Section 2: Toggles (@ #) and Test Mode (time/words) -->
+            <div class="menu-section" id="menu-controls"></div>
 
-            <div class="menu-group right-group" id="dynamic-menu"></div>
-            <div class="menu-sep" aria-hidden="true"></div>
-
-            <div class="timer-display" id="timer-display"></div>
+            <!-- Section 3: Options for time/word -->
+            <div class="menu-section" id="menu-options"></div>
         </div>
+
 
         <!-- Typing Display Area -->
         <div class="typing-area" id="typing-area">
+            <!-- Hidden input to trigger mobile keyboard -->
+            <input type="text" id="mobile-input" class="mobile-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" aria-hidden="true" />
+            <div class="timer-display" id="timer-display"></div>
             <div class="typing-text" id="typing-text"></div>
             <div class="cursor" id="cursor"></div>
             

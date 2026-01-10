@@ -52,10 +52,12 @@ const typingTextEl = document.getElementById('typing-text');
 const cursorEl = document.getElementById('cursor');
 const resultCardEl = document.getElementById('result-card');
 const timerEl = document.getElementById('timer-display');
-const dynamicMenuEl = document.getElementById('dynamic-menu');
+const controlsMenuEl = document.getElementById('menu-controls');
+const optionsMenuEl = document.getElementById('menu-options');
 const restartBtnEl = document.getElementById('restart-btn');
 const typingAreaEl = document.getElementById('typing-area');
 const themeBtnEl = document.getElementById('theme-btn');
+const mobileInputEl = document.getElementById('mobile-input');
 
 // ===== DOM VALIDATION =====
 function validateDOMElements() {
@@ -64,10 +66,12 @@ function validateDOMElements() {
         cursorEl,
         resultCardEl,
         timerEl,
-        dynamicMenuEl,
+        controlsMenuEl,
+        optionsMenuEl,
         restartBtnEl,
         typingAreaEl,
-        themeBtnEl
+        themeBtnEl,
+        mobileInputEl
     };
     
     for (const [name, element] of Object.entries(requiredElements)) {
@@ -168,36 +172,28 @@ function createMenuGroup(buttons) {
     return group;
 }
 
-function createMenuSeparator(isInline = false) {
-    const sep = document.createElement('div');
-    sep.className = isInline ? 'menu-sep menu-sep-inline' : 'menu-sep';
-    return sep;
-}
+// Separators removed; spacing handled with CSS gaps.
 
 // ===== MENU RENDERING =====
 function renderMenuOptions() {
-    if (!dynamicMenuEl) return;
-
-    // Render into horizontal menu
-    dynamicMenuEl.innerHTML = '';
+    if (!controlsMenuEl || !optionsMenuEl) return;
+    controlsMenuEl.innerHTML = '';
+    optionsMenuEl.innerHTML = '';
 
     if (state.currentMode === MODES.TEST) {
         // Punctuation toggle
         const punctBtn = createMenuButton('@', 'toggle-punctuation', null, state.punctuation, true, 'Toggle Punctuation');
-        dynamicMenuEl.appendChild(punctBtn);
+        controlsMenuEl.appendChild(punctBtn);
 
         // Numbers toggle
         const numbersBtn = createMenuButton('#', 'toggle-numbers', null, state.numbers, true, 'Toggle Numbers');
-        dynamicMenuEl.appendChild(numbersBtn);
+        controlsMenuEl.appendChild(numbersBtn);
 
         // Test mode selector
         const timeModeBtn = createMenuButton('time', 'set-test-mode', TEST_MODES.TIME, state.testMode === TEST_MODES.TIME);
         const wordsModeBtn = createMenuButton('words', 'set-test-mode', TEST_MODES.WORDS, state.testMode === TEST_MODES.WORDS);
         const testModeGroup = createMenuGroup([timeModeBtn, wordsModeBtn]);
-        dynamicMenuEl.appendChild(testModeGroup);
-
-        // Separator
-        dynamicMenuEl.appendChild(createMenuSeparator(true));
+        controlsMenuEl.appendChild(testModeGroup);
 
         // Duration/Count options
         const options = state.testMode === TEST_MODES.TIME ? ['off', '15', '30', '60', '120'] : ['10', '25', '50', '100'];
@@ -215,7 +211,7 @@ function renderMenuOptions() {
             return createMenuButton(opt, 'set-duration', opt, isActive);
         });
         const optionsGroup = createMenuGroup(optionButtons);
-        dynamicMenuEl.appendChild(optionsGroup);
+        optionsMenuEl.appendChild(optionsGroup);
     } else if (state.currentMode === MODES.PRACTICE) {
         // Practice row selection buttons
         const rows = [
@@ -236,9 +232,126 @@ function renderMenuOptions() {
             )
         );
         const rowGroup = createMenuGroup(rowButtons);
-        dynamicMenuEl.appendChild(rowGroup);
+        controlsMenuEl.appendChild(rowGroup);
     }
+    // No separators; spacing handled via CSS.
 
+}
+
+// ===== MODAL RENDERING (MOBILE SETTINGS) =====
+function renderModalSettings() {
+    const modalBodyEl = document.getElementById('modal-body');
+    if (!modalBodyEl) return;
+
+    modalBodyEl.innerHTML = '';
+
+    if (state.currentMode === MODES.TEST) {
+        // Punctuation & Numbers section
+        const toggleSection = document.createElement('div');
+        toggleSection.className = 'modal-section';
+        
+        const toggleTitle = document.createElement('div');
+        toggleTitle.className = 'modal-section-title';
+        toggleTitle.textContent = 'Options';
+        toggleSection.appendChild(toggleTitle);
+
+        const toggleButtons = document.createElement('div');
+        toggleButtons.className = 'modal-buttons';
+
+        const punctBtn = createMenuButton('@', 'toggle-punctuation', null, state.punctuation, true, 'Toggle Punctuation');
+        const numbersBtn = createMenuButton('#', 'toggle-numbers', null, state.numbers, true, 'Toggle Numbers');
+        
+        toggleButtons.appendChild(punctBtn);
+        toggleButtons.appendChild(numbersBtn);
+        toggleSection.appendChild(toggleButtons);
+        modalBodyEl.appendChild(toggleSection);
+
+        // Test Mode section
+        const modeSection = document.createElement('div');
+        modeSection.className = 'modal-section';
+
+        const modeTitle = document.createElement('div');
+        modeTitle.className = 'modal-section-title';
+        modeTitle.textContent = 'Test Mode';
+        modeSection.appendChild(modeTitle);
+
+        const modeButtons = document.createElement('div');
+        modeButtons.className = 'modal-buttons';
+
+        const timeModeBtn = createMenuButton('Time', 'set-test-mode', TEST_MODES.TIME, state.testMode === TEST_MODES.TIME);
+        const wordsModeBtn = createMenuButton('Words', 'set-test-mode', TEST_MODES.WORDS, state.testMode === TEST_MODES.WORDS);
+
+        modeButtons.appendChild(timeModeBtn);
+        modeButtons.appendChild(wordsModeBtn);
+        modeSection.appendChild(modeButtons);
+        modalBodyEl.appendChild(modeSection);
+
+        // Duration/Count section
+        const durationSection = document.createElement('div');
+        durationSection.className = 'modal-section';
+
+        const durationTitle = document.createElement('div');
+        durationTitle.className = 'modal-section-title';
+        durationTitle.textContent = state.testMode === TEST_MODES.TIME ? 'Duration' : 'Word Count';
+        durationSection.appendChild(durationTitle);
+
+        const options = state.testMode === TEST_MODES.TIME ? ['off', '15', '30', '60', '120'] : ['10', '25', '50', '100'];
+        const durationButtons = document.createElement('div');
+        durationButtons.className = 'modal-buttons';
+
+        options.forEach(opt => {
+            let isActive = false;
+            if (state.testMode === TEST_MODES.TIME) {
+                if (opt === 'off') {
+                    isActive = state.timerMode === TIMER_MODES.OFF;
+                } else {
+                    isActive = state.timerMode === TIMER_MODES.COUNTDOWN && state.timeDuration === parseInt(opt);
+                }
+            } else {
+                isActive = state.wordCount === parseInt(opt);
+            }
+            const btn = createMenuButton(opt, 'set-duration', opt, isActive);
+            durationButtons.appendChild(btn);
+        });
+
+        durationSection.appendChild(durationButtons);
+        modalBodyEl.appendChild(durationSection);
+
+    } else if (state.currentMode === MODES.PRACTICE) {
+        // Practice Row section
+        const rowSection = document.createElement('div');
+        rowSection.className = 'modal-section';
+
+        const rowTitle = document.createElement('div');
+        rowTitle.className = 'modal-section-title';
+        rowTitle.textContent = 'Practice Row';
+        rowSection.appendChild(rowTitle);
+
+        const rows = [
+            { id: 'middle', label: 'Middle' },
+            { id: 'upper', label: 'Upper' },
+            { id: 'lower', label: 'Lower' },
+            { id: 'num', label: 'Number' },
+            { id: 'special', label: 'Special' },
+            { id: 'mixed', label: 'Mixed' }
+        ];
+
+        const rowButtons = document.createElement('div');
+        rowButtons.className = 'modal-buttons';
+
+        rows.forEach(row => {
+            const btn = createMenuButton(
+                row.label,
+                'set-practice-row',
+                row.id,
+                state.practiceRow === row.id
+            );
+            rowButtons.appendChild(btn);
+        });
+
+        rowSection.appendChild(rowButtons);
+        modalBodyEl.appendChild(rowSection);
+    }
 }
 
 // (overflow detection removed — settings overlay scrapped)
@@ -257,7 +370,12 @@ function updateTimerDisplay(text) {
             timerEl.textContent = String(state.timeDuration) + 's';
         }
     }
-    timerEl.classList.add('active');
+    // Only show timer if test is active (typing has started)
+    if (state.testActive) {
+        timerEl.classList.add('active');
+    } else {
+        timerEl.classList.remove('active');
+    }
 }
 
 // ===== STATE HELPERS =====
@@ -275,6 +393,8 @@ function resetUI() {
     if (cursorEl) cursorEl.classList.remove('active');
     if (timerEl) timerEl.classList.remove('active');
     if (resultCardEl) resultCardEl.classList.add('hidden');
+    // Remove global blur state
+    document.body.classList.remove('blur-active');
 }
 
 // Check if results are currently displayed
@@ -361,7 +481,7 @@ function handleSetDuration(value) {
         if (state.testActive && state.testMode === TEST_MODES.WORDS) {
             startCountUpTimer();
         } else {
-            updateTimerDisplay('0s');
+            updateTimerDisplay();
         }
     } else if (state.testMode === TEST_MODES.TIME) {
         state.timerMode = TIMER_MODES.COUNTDOWN;
@@ -404,8 +524,9 @@ function setupEventListeners() {
     });
 
     // Dynamic menu actions
-    if (dynamicMenuEl) {
-        dynamicMenuEl.addEventListener('click', (e) => {
+    // Actions in controls/options sections
+    if (controlsMenuEl) {
+        controlsMenuEl.addEventListener('click', (e) => {
             if (!e.target.dataset.action) return;
 
             const action = e.target.dataset.action;
@@ -434,6 +555,16 @@ function setupEventListeners() {
             }
         });
     }
+    if (optionsMenuEl) {
+        optionsMenuEl.addEventListener('click', (e) => {
+            if (!e.target.dataset.action) return;
+            const action = e.target.dataset.action;
+            const value = e.target.dataset.value;
+            if (action === 'set-duration') {
+                handleSetDuration(value);
+            }
+        });
+    }
 
     // (vertical menu handling removed)
 
@@ -457,6 +588,18 @@ function setupEventListeners() {
             if (!state.testActive && !state.testStarted && cursorEl) {
                 cursorEl.classList.add('active');
             }
+            // Focus hidden input to show mobile keyboard
+            if (mobileInputEl) mobileInputEl.focus();
+        });
+
+        // Also focus on touch to ensure mobile keyboard opens
+        typingArea.addEventListener('touchstart', () => {
+            if (isResultsShown()) return;
+            if (mobileInputEl) mobileInputEl.focus();
+        }, { passive: true });
+        typingArea.addEventListener('pointerdown', () => {
+            if (isResultsShown()) return;
+            if (mobileInputEl) mobileInputEl.focus();
         });
     }
 
@@ -473,10 +616,44 @@ function setupEventListeners() {
         themeBtnEl.addEventListener('click', cycleTheme);
     }
 
-    // Re-check placeholder on resize (no overflow UI)
-    window.addEventListener('resize', () => {
-        // no-op (settings overlay removed)
-    });
+    // Mobile input handling (for devices requiring a focused input)
+    if (mobileInputEl) {
+        // When value changes, process typed char or backspace
+        mobileInputEl.addEventListener('input', (e) => {
+            if (isResultsShown()) return;
+
+            // Start test on first input
+            if (!state.testStarted) {
+                startTest();
+            }
+
+            const ev = e; // InputEvent
+            const data = ev.data; // last inserted character
+            const inputType = ev.inputType;
+
+            if (inputType === 'deleteContentBackward') {
+                handleBackspace();
+            } else if (typeof data === 'string' && data.length > 0) {
+                processTypedCharacter(data);
+            }
+
+            // Clear the hidden input to keep it minimal
+            mobileInputEl.value = '';
+        });
+
+        // Ensure backspace and special keys still work
+        mobileInputEl.addEventListener('keydown', (e) => {
+            // Forward Backspace explicitly (some browsers emit keydown)
+            if (e.key === 'Backspace') {
+                e.preventDefault();
+                handleBackspace();
+            }
+        });
+    }
+
+
+    // No separators to update on resize.
+    window.addEventListener('resize', () => {});
 
 }
 
@@ -615,6 +792,10 @@ function updateDisplay() {
         if (char === ' ') {
             span.classList.add('space');
             span.textContent = '\u00A0'; // non-breaking space to preserve width
+        } else if (char === '\n') {
+            // Render newline as visible space placeholder
+            span.classList.add('space');
+            span.textContent = '\u00A0'; // non-breaking space to preserve width
         } else {
             span.textContent = char;
         }
@@ -640,6 +821,13 @@ function updateDisplay() {
     if (state.testActive || state.testStarted) {
         scrollToCurrentChar();
         updateCursorPosition();
+    }
+
+    // Update timer visibility
+    if (state.testActive && timerEl) {
+        timerEl.classList.add('active');
+    } else if (timerEl) {
+        timerEl.classList.remove('active');
     }
 }
 
@@ -759,6 +947,30 @@ function handleBackspace() {
     }
 }
 
+// Process a single typed character (used by mobile input)
+function processTypedCharacter(typedChar) {
+    if (!state.testActive) return;
+    if (state.currentCharIndex < state.testText.length) {
+        const expectedChar = state.testText[state.currentCharIndex];
+
+        state.keyTracker[state.currentCharIndex] = typedChar;
+
+        if (typedChar === expectedChar) {
+            state.correctCount++;
+        } else {
+            state.errorCount++;
+        }
+
+        state.currentCharIndex++;
+
+        if (state.currentCharIndex >= state.testText.length) {
+            endTest();
+        }
+
+        updateDisplay();
+    }
+}
+
 // ===== TIMER HELPERS =====
 function clearTimer() {
     if (state.timerInterval) {
@@ -767,7 +979,7 @@ function clearTimer() {
     }
 }
 
-function updateTimerDisplay(text) {
+function updateTimerDisplayDuringTest(text) {
     if (!timerEl) return;
     timerEl.textContent = text;
     timerEl.classList.add('active');
@@ -784,6 +996,9 @@ function startTest() {
     state.keyTracker = [];
 
     if (cursorEl) cursorEl.classList.add('active');
+
+    // Enable global blur for non-typing elements
+    document.body.classList.add('blur-active');
 
     // Clear any previous timer
     clearTimer();
@@ -806,11 +1021,11 @@ function startTest() {
 
 function startCountdownTimer(duration, shouldEndTest = false) {
     let timeRemaining = duration;
-    updateTimerDisplay(timeRemaining + 's');
+    updateTimerDisplayDuringTest(timeRemaining + 's');
 
     state.timerInterval = setInterval(() => {
         timeRemaining--;
-        updateTimerDisplay(timeRemaining + 's');
+        updateTimerDisplayDuringTest(timeRemaining + 's');
 
         if (timeRemaining <= 0) {
             clearTimer();
@@ -823,11 +1038,11 @@ function startCountdownTimer(duration, shouldEndTest = false) {
 
 function startCountUpTimer() {
     let timeElapsed = 0;
-    updateTimerDisplay('0s');
+    updateTimerDisplayDuringTest('0s');
 
     state.timerInterval = setInterval(() => {
         timeElapsed++;
-        updateTimerDisplay(timeElapsed + 's');
+        updateTimerDisplayDuringTest(timeElapsed + 's');
     }, 1000);
 }
 
@@ -835,6 +1050,8 @@ function endTest() {
     state.testActive = false;
     if (cursorEl) cursorEl.classList.remove('active');
     clearTimer();
+    // Disable blur when test ends
+    document.body.classList.remove('blur-active');
 
     // Calculate results
     const timeElapsedMinutes = (Date.now() - state.timeStarted) / 1000 / 60; // in minutes

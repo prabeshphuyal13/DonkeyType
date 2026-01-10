@@ -100,6 +100,37 @@ html, body {
     filter: drop-shadow(0 1px 0 rgba(0,0,0,0.25));
 }
 
+/* ===== FOCUS BLUR WHEN TYPING ===== */
+body.blur-active .logo,
+body.blur-active .theme-btn,
+body.blur-active .menu-bar {
+    filter: blur(4px);
+    opacity: 0.6;
+    pointer-events: none;
+    transition: filter var(--transition), opacity var(--transition);
+}
+
+body.blur-active .typing-area {
+    filter: none !important;
+    opacity: 1;
+}
+
+/* Hidden input for mobile keyboard trigger */
+.mobile-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    border: 0;
+    background: transparent;
+    color: transparent;
+    caret-color: transparent;
+    outline: none;
+    z-index: 5; /* below timer but above background */
+}
+
 .logo-text {
     font-size: 18px;
     font-weight: 700;
@@ -126,16 +157,16 @@ html, body {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 14px; /* more space between sections */
     background: rgba(26, 31, 46, 0.5);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(59, 130, 246, 0.15);
     border-radius: 10px;
     padding: 10px 14px;
-    white-space: nowrap;
-    flex-wrap: nowrap; /* keep a single row; show settings button if overflow */
+    white-space: normal;
+    flex-wrap: wrap; /* allow sections to wrap to next line */
     margin-top: var(--layout-offset);
-    overflow-x: auto;
+    overflow-x: visible;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     z-index: 90; /* keep below the logo (logo z-index:100) so logo visually sits above */
@@ -151,12 +182,17 @@ html, body {
 }
 
 .menu-sep {
-    width: 2px;
-    height: 30px;
-    background: rgba(255, 255, 255, 0.12);
-    margin: 0 var(--menu-sep-gap);
-    border-radius: 1px;
-    flex-shrink: 0;
+    display: none; /* separators removed */
+}
+
+/* Menu sections that center and wrap */
+.menu-section {
+    display: flex;
+    flex-direction: row;
+    gap: 10px; /* space between buttons inside a section */
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
 }
 
 .menu-group {
@@ -214,12 +250,152 @@ html, body {
     opacity: 0.5;
 }
 
-/* Ensure timer display matches menu height and stays aligned */
-.menu-bar .timer-display {
-    height: 36px;
+/* ===== SETTINGS BUTTON ===== */
+.settings-btn {
+    display: none; /* Hidden on desktop, shown on mobile */
+    background: transparent;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    color: var(--text-primary);
+    width: 32px;
+    height: 32px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all var(--transition);
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.settings-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.settings-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===== SETTINGS MODAL ===== */
+.settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    animation: slideUpModal 0.3s ease;
+}
+
+.settings-modal.hidden {
+    display: none;
+}
+
+@keyframes slideUpModal {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    position: relative;
+    background: var(--bg-dark);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+    animation: slideUpContent 0.3s ease;
+}
+
+@keyframes slideUpContent {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.12);
+    background: rgba(26, 31, 46, 0.5);
+}
+
+.modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
-    padding: 0 8px;
+    justify-content: center;
+    transition: color var(--transition);
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-section-title {
+    font-size: 12px;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.12);
+}
+
+.modal-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 /* ===== TYPING AREA ===== */
@@ -266,6 +442,7 @@ html, body {
     overflow-x: hidden;
     max-height: 100%;
     padding-right: 8px;
+    padding-top: 40px;
     scroll-behavior: auto;
     scrollbar-gutter: stable;
 }
@@ -348,25 +525,28 @@ html, body {
 
 /* ===== TIMER DISPLAY ===== */
 .timer-display {
-    font-size: 18px;
-    font-weight: 600;
-    color: #ffffff;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--accent-blue);
     font-variant-numeric: tabular-nums;
-    min-width: 50px;
-    text-align: center;
     display: none;
-    padding: 0 6px;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     white-space: nowrap;
     flex-shrink: 0;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    background: transparent;
+    border: none;
+    padding: 0;
 }
 
 .timer-display.active {
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ===== RESULT CARD ===== */
@@ -475,12 +655,13 @@ html, body {
         gap: 6px;
         width: min(95vw, 1000px);
         max-width: 1000px;
-        overflow-x: auto;
+        flex-wrap: wrap;
+        overflow-x: visible;
         overflow-y: hidden;
-        scrollbar-width: none; /* Firefox */
+        scrollbar-width: none;
     }
 
-    .menu-bar::-webkit-scrollbar { display: none; /* Chrome, Safari, Edge */ }
+    .menu-bar::-webkit-scrollbar { display: none; }
 
     .menu-btn {
         padding: 5px 10px;
@@ -508,38 +689,24 @@ html, body {
 }
 
 @media (max-width: 768px) {
+    /* Sections wrap; separators added dynamically */
     .menu-bar {
         padding: 6px 8px;
-        gap: 4px;
+        gap: 6px;
         width: min(95vw, 1000px);
         max-width: 1000px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        scrollbar-width: none; /* Firefox */
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
-    .menu-bar::-webkit-scrollbar { display: none; /* Chrome, Safari, Edge */ }
-
-    .menu-section {
-        flex-wrap: nowrap;
-    }
-
-    .menu-group {
-        flex-wrap: nowrap;
-        gap: 4px;
+    .left-group {
+        gap: 6px;
     }
 
     .menu-btn {
-        top: 22%;
-        font-size: 10px;
+        padding: 5px 10px;
+        font-size: 11px;
         height: 28px;
-        flex-shrink: 0;
-    }
-
-    .menu-sep {
-        height: 24px;
-        margin: 0 2px;
         flex-shrink: 0;
     }
 
@@ -556,6 +723,10 @@ html, body {
         line-height: 1.5;
     }
 
+    .timer-display {
+        font-size: 16px;
+    }
+
     .result-card {
         width: auto;
         padding: 0;
@@ -565,6 +736,8 @@ html, body {
     .container {
         gap: 30px;
     }
+
+    /* (modal removed) */
 }
 
 @media (max-width: 480px) {
@@ -575,16 +748,12 @@ html, body {
 
     .menu-bar {
         padding: 6px 8px;
-        gap: 3px;
+        gap: 4px;
         width: min(95vw, 1000px);
         max-width: 1000px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        scrollbar-width: none; /* Firefox */
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
+        justify-content: center;
     }
-
-    .menu-bar::-webkit-scrollbar { display: none; /* Chrome, Safari, Edge */ }
 
     .menu-btn {
         padding: 4px 8px;
@@ -594,9 +763,7 @@ html, body {
     }
 
     .menu-sep {
-        height: 20px;
-        margin: 0 2px;
-        flex-shrink: 0;
+        display: none;
     }
 
     .typing-area {
