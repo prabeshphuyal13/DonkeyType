@@ -44,7 +44,8 @@ const state = {
     timeElapsed: 0,
     timerInterval: null,
     
-    keyTracker: [] // tracks all key presses for accuracy calculation
+    keyTracker: [], // tracks all key presses for accuracy calculation
+    hintEnabled: false // tracks if hint button is active
 };
 
 // ===== DOM ELEMENTS =====
@@ -58,6 +59,9 @@ const restartBtnEl = document.getElementById('restart-btn');
 const typingAreaEl = document.getElementById('typing-area');
 const themeBtnEl = document.getElementById('theme-btn');
 const mobileInputEl = document.getElementById('mobile-input');
+const hintBtnEl = document.getElementById('hint-btn');
+const hintImageContainerEl = document.getElementById('hint-image-container');
+const hintImageEl = document.getElementById('hint-image');
 
 // ===== DOM VALIDATION =====
 function validateDOMElements() {
@@ -71,7 +75,10 @@ function validateDOMElements() {
         restartBtnEl,
         typingAreaEl,
         themeBtnEl,
-        mobileInputEl
+        mobileInputEl,
+        hintBtnEl,
+        hintImageContainerEl,
+        hintImageEl
     };
     
     for (const [name, element] of Object.entries(requiredElements)) {
@@ -395,6 +402,19 @@ function resetUI() {
     if (resultCardEl) resultCardEl.classList.add('hidden');
     // Remove global blur state
     document.body.classList.remove('blur-active');
+    // Clear hint image visibility (but preserve hint enabled state)
+    if (hintImageContainerEl) {
+        hintImageContainerEl.classList.remove('visible');
+        hintImageContainerEl.classList.add('hidden');
+    }
+    // Restore hint button visual state based on state.hintEnabled
+    if (hintBtnEl) {
+        if (state.hintEnabled) {
+            hintBtnEl.classList.add('active');
+        } else {
+            hintBtnEl.classList.remove('active');
+        }
+    }
 }
 
 // Check if results are currently displayed
@@ -573,7 +593,8 @@ function setupEventListeners() {
 
     // Restart button
     if (restartBtnEl) {
-        restartBtnEl.addEventListener('click', () => {
+        restartBtnEl.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from bubbling to typing-area
             resetTest();
         });
     }
@@ -614,6 +635,33 @@ function setupEventListeners() {
     // Theme toggle button
     if (themeBtnEl) {
         themeBtnEl.addEventListener('click', cycleTheme);
+    }
+
+    // Hint button: toggle hint image visibility (allow click anytime, show image only when typing)
+    if (hintBtnEl) {
+        hintBtnEl.addEventListener('click', () => {
+            if (!hintImageContainerEl) return;
+            // Toggle hint state
+            state.hintEnabled = !state.hintEnabled;
+            
+            if (state.hintEnabled) {
+                // Activate hint button
+                hintBtnEl.classList.add('active');
+                // Only show image if typing is active (blur state is on)
+                if (document.body.classList.contains('blur-active')) {
+                    hintImageContainerEl.classList.remove('hidden');
+                    hintImageContainerEl.classList.add('visible');
+                    if (hintImageEl) {
+                        hintImageEl.src = 'assets/hint.png';
+                    }
+                }
+            } else {
+                // Deactivate hint button and hide image
+                hintBtnEl.classList.remove('active');
+                hintImageContainerEl.classList.add('hidden');
+                hintImageContainerEl.classList.remove('visible');
+            }
+        });
     }
 
     // Mobile input handling (for devices requiring a focused input)
@@ -782,6 +830,9 @@ function insertRandomElements(text, elements, probability) {
 function updateDisplay() {
     if (!typingTextEl || !state.testText) return;
     
+    // Store cursor reference before clearing
+    const cursorElement = cursorEl;
+    
     typingTextEl.innerHTML = '';
 
     state.testText.split('').forEach((char, index) => {
@@ -816,6 +867,11 @@ function updateDisplay() {
 
         typingTextEl.appendChild(span);
     });
+
+    // Re-append cursor inside typing-text so it scrolls with content
+    if (cursorElement) {
+        typingTextEl.appendChild(cursorElement);
+    }
 
     // Auto-scroll to current character
     if (state.testActive || state.testStarted) {
@@ -857,29 +913,42 @@ function updateCursorPosition() {
     const chars = typingTextEl.querySelectorAll('.char');
     if (chars[state.currentCharIndex]) {
         const currentChar = chars[state.currentCharIndex];
-        const typingArea = document.querySelector('.typing-area');
-        if (!typingArea) return;
         
-        // Get positions relative to viewport
-        const charRect = currentChar.getBoundingClientRect();
-        const areaRect = typingArea.getBoundingClientRect();
-        
-        // Calculate position relative to typing-area container
-        cursorEl.style.left = (charRect.left - areaRect.left) + 'px';
-        cursorEl.style.top = (charRect.top - areaRect.top) + 'px';
+        // Position cursor at the left edge of current character
+        // Using offsetLeft/offsetTop since cursor is inside typing-text
+        cursorEl.style.left = currentChar.offsetLeft + 'px';
+        cursorEl.style.top = currentChar.offsetTop + 'px';
         
         // Match cursor height to character height
-        cursorEl.style.height = charRect.height + 'px';
+        cursorEl.style.height = currentChar.offsetHeight + 'px';
     }
 }
 
 // ===== KEYPRESS HANDLING =====
 function handleKeyPress(e) {
+    // Handle Ctrl+H to toggle hint (works anytime)
+    if (e.ctrlKey && e.key.toLowerCase() === 'h') {
+        e.preventDefault();
+        if (hintBtnEl) {
+            hintBtnEl.click(); // Trigger the hint button click handler
+        }
+        return;
+    }
+
     // Handle Enter key when result card is visible (only allowed action)
     if (e.key === 'Enter') {
         if (isResultsShown()) {
             e.preventDefault();
             resetTest();
+            return;
+        }
+    }
+
+    // Handle Escape to end test and show results (while typing)
+    if (e.key === 'Escape') {
+        if (state.testActive) {
+            e.preventDefault();
+            endTest();
             return;
         }
     }
@@ -1000,6 +1069,16 @@ function startTest() {
     // Enable global blur for non-typing elements
     document.body.classList.add('blur-active');
 
+    // Show hint image if hint is enabled (state persists across restarts)
+    if (state.hintEnabled && hintImageContainerEl) {
+        hintBtnEl.classList.add('active'); // Ensure button shows active
+        hintImageContainerEl.classList.remove('hidden');
+        hintImageContainerEl.classList.add('visible');
+        if (hintImageEl) {
+            hintImageEl.src = 'assets/hint.png';
+        }
+    }
+
     // Clear any previous timer
     clearTimer();
 
@@ -1052,6 +1131,11 @@ function endTest() {
     clearTimer();
     // Disable blur when test ends
     document.body.classList.remove('blur-active');
+    // Hide hint image when test ends (but keep button state for restart)
+    if (hintImageContainerEl) {
+        hintImageContainerEl.classList.remove('visible');
+        hintImageContainerEl.classList.add('hidden');
+    }
 
     // Calculate results
     const timeElapsedMinutes = (Date.now() - state.timeStarted) / 1000 / 60; // in minutes

@@ -408,12 +408,13 @@ body.blur-active .typing-area {
     border: 1px solid rgba(59, 130, 246, 0.12);
     border-radius: 10px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     position: relative; /* make result-card position relative to this box */
     cursor: text;
     transition: all var(--transition);
-    overflow: hidden;
+    overflow: visible; /* allow hint image above to show */
     flex-shrink: 0;
     margin-left: 0;
     margin-top: var(--typing-offset);
@@ -423,6 +424,104 @@ body.blur-active .typing-area {
     border-color: rgba(59, 130, 246, 0.3);
     background: rgba(26, 31, 46, 0.35);
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+/* Header section inside typing area */
+.typing-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+    position: relative;
+    z-index: 12; /* above text but below result card */
+}
+
+/* Timer repositioned to header (now on left) */
+.typing-area .timer-display {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 17px;
+    z-index: 12;
+}
+
+/* Hint button styling */
+.hint-btn {
+    background: transparent;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    color: var(--btn-text-color);
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+}
+
+.hint-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.hint-btn:active {
+    transform: scale(0.95);
+}
+
+/* Keep hint button always on the right */
+.typing-header .hint-btn {
+    margin-left: auto;
+}
+
+/* Active state matches .menu-btn.active styling */
+.hint-btn.active {
+    background: #ffffff;
+    color: var(--btn-active-text-color);
+    border-color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.4), 0 2px 4px rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
+}
+
+.hint-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Hint image container (overlay) - positioned above typing area */
+.hint-image-container {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 10px;
+    z-index: 99; /* above everything in the typing area */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.hint-image-container.hidden {
+    display: none;
+}
+
+.hint-image-container.visible {
+    display: flex;
+}
+
+.hint-image {
+    max-width: 360px;
+    max-height: 360px;
+    object-fit: contain;
 }
 
 .typing-text {
